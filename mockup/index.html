@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Yeelight Kontrol — Mockup</title>
+<style>
+  :root {
+    --bg: #0f1115; --panel: #171a21; --panel-2: #1f232c; --line: #2a2f3a;
+    --text: #e8eaf0; --muted: #8b93a5; --accent: #ffb547; --danger: #ff5d5d; --ok: #3ddc97;
+    --radius: 16px;
+  }
+  :root[data-theme="light"] {
+    --bg: #f3f4f7; --panel: #ffffff; --panel-2: #f0f1f5; --line: #e1e4ea;
+    --text: #1a1d24; --muted: #6b7385;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body { background: var(--bg); color: var(--text); font: 15px/1.45 "Segoe UI", system-ui, sans-serif; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+
+  .app { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+
+  /* Kenar çubuğu */
+  aside { background: var(--panel); border-right: 1px solid var(--line); padding: 20px 16px; display: flex; flex-direction: column; gap: 14px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 17px; }
+  .brand .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent); }
+  .section-title { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 8px 4px 0; }
+  .device { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; border: 1px solid transparent; background: none; text-align: left; width: 100%; }
+  .device:hover { background: var(--panel-2); }
+  .device.active { background: var(--panel-2); border-color: var(--line); }
+  .device .swatch { width: 28px; height: 28px; border-radius: 50%; flex: none; border: 2px solid var(--line); }
+  .device small { display: block; color: var(--muted); font-size: 12px; }
+  .device .status { margin-left: auto; width: 8px; height: 8px; border-radius: 50%; background: var(--ok); }
+  .device.offline .status { background: var(--muted); }
+  .device.offline { opacity: .55; }
+  .ghost-btn { background: var(--panel-2); border: 1px dashed var(--line); border-radius: 12px; padding: 10px; color: var(--muted); }
+  .ghost-btn:hover { color: var(--text); }
+  .aside-foot { margin-top: auto; display: flex; gap: 8px; }
+  .icon-btn { background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; }
+
+  /* Ana alan */
+  main { padding: 24px 32px 40px; max-width: 1100px; width: 100%; }
+  .header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+  .header h1 { font-size: 22px; margin: 0; }
+  .header .meta { color: var(--muted); font-size: 13px; }
+  .power { margin-left: auto; width: 56px; height: 56px; border-radius: 50%; border: none; background: var(--accent); color: #1a1200; font-size: 22px; box-shadow: 0 0 24px rgba(255,181,71,.4); }
+  .power.off { background: var(--panel-2); color: var(--muted); box-shadow: none; border: 1px solid var(--line); }
+
+  .grid { display: grid; grid-template-columns: 300px 1fr; gap: 20px; }
+  .grid > *, main { min-width: 0; }
+  body { overflow-x: hidden; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
+
+  /* Ampul önizleme */
+  .preview { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+  .bulb-wrap { width: 200px; height: 200px; display: grid; place-items: center; }
+  .bulb { width: 130px; height: 130px; border-radius: 50%; transition: background .3s, box-shadow .3s, opacity .3s; }
+  .readout { text-align: center; }
+  .readout b { font-size: 18px; }
+  .readout div { color: var(--muted); font-size: 13px; }
+  .slider-row { width: 100%; display: flex; align-items: center; gap: 10px; }
+  .slider-row span { color: var(--muted); font-size: 13px; width: 38px; text-align: right; }
+  input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 10px; border-radius: 999px; background: var(--panel-2); outline: none; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; background: #fff; border: 3px solid var(--accent); }
+  input[type=range]::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: #fff; border: 3px solid var(--accent); }
+  #bright { background: linear-gradient(90deg, #333, var(--accent)); }
+  #ct { background: linear-gradient(90deg, #ff9329, #ffd6a5, #fff, #cfe3ff); }
+
+  /* Sekmeler */
+  .tabs { display: flex; gap: 6px; background: var(--panel-2); padding: 5px; border-radius: 12px; margin-bottom: 18px; }
+  .tab { flex: 1; border: none; background: none; padding: 9px 6px; border-radius: 9px; color: var(--muted); }
+  .tab.active { background: var(--panel); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,.2); }
+  .pane { display: none; }
+  .pane.active { display: block; }
+
+  .wheel-box { display: flex; gap: 24px; align-items: center; flex-wrap: wrap; justify-content: center; }
+  canvas { border-radius: 50%; touch-action: none; cursor: crosshair; max-width: 100%; }
+  .palette { display: grid; grid-template-columns: repeat(4, 40px); gap: 10px; }
+  .palette button { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--line); }
+  .hex { margin-top: 12px; display: flex; gap: 8px; align-items: center; color: var(--muted); font-size: 13px; }
+  .hex code { background: var(--panel-2); padding: 4px 8px; border-radius: 6px; color: var(--text); }
+
+  .tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+  .tile { border: 1px solid var(--line); background: var(--panel-2); border-radius: 14px; padding: 14px; text-align: left; position: relative; }
+  .tile:hover { border-color: var(--accent); }
+  .tile .chip { width: 100%; height: 44px; border-radius: 10px; margin-bottom: 10px; }
+  .tile small { color: var(--muted); display: block; font-size: 12px; }
+  .tile .del { position: absolute; top: 8px; right: 8px; background: none; border: none; color: var(--muted); font-size: 14px; }
+  .tile.add { border-style: dashed; display: grid; place-items: center; color: var(--muted); min-height: 110px; }
+  .tile.running { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+
+  .ct-presets { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+  .pill { border: 1px solid var(--line); background: var(--panel-2); border-radius: 999px; padding: 7px 14px; font-size: 13px; }
+  .pill:hover, .pill.active { border-color: var(--accent); }
+  .timer-status { margin-top: 18px; padding: 14px; border-radius: 12px; background: var(--panel-2); color: var(--muted); }
+  .timer-status b { color: var(--text); }
+  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 14px; }
+  input[type=number], input[type=text] { background: var(--panel-2); border: 1px solid var(--line); color: var(--text); border-radius: 10px; padding: 8px 10px; font: inherit; }
+  .primary { background: var(--accent); color: #1a1200; border: none; border-radius: 10px; padding: 9px 16px; font-weight: 600; }
+  .muted { color: var(--muted); font-size: 13px; }
+
+  /* Komut günlüğü (mockup'a özel) */
+  .log { margin-top: 20px; font: 12px/1.5 Consolas, monospace; color: var(--muted); background: var(--panel); border: 1px dashed var(--line); border-radius: 12px; padding: 10px 14px; max-height: 120px; overflow: auto; }
+  .log b { color: var(--accent); font-weight: normal; }
+
+  /* Modal */
+  .modal { position: fixed; inset: 0; background: rgba(0,0,0,.55); display: none; place-items: center; padding: 16px; z-index: 10; }
+  .modal.open { display: grid; }
+  .modal .card { width: 100%; max-width: 380px; }
+  .modal h3 { margin-top: 0; }
+  .modal label { display: block; margin: 12px 0 4px; font-size: 13px; color: var(--muted); }
+  .modal input { width: 100%; }
+
+  .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--panel-2); border: 1px solid var(--line); padding: 10px 16px; border-radius: 12px; transition: transform .25s; z-index: 20; }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  .mobile-top { display: none; }
+
+  @media (max-width: 860px) {
+    .app { grid-template-columns: 1fr; }
+    aside { display: none; }
+    .mobile-top { display: flex; align-items: center; gap: 8px; padding: 12px 16px; background: var(--panel); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 5; }
+    .mobile-top select { flex: 1; background: var(--panel-2); color: var(--text); border: 1px solid var(--line); border-radius: 10px; padding: 8px; font: inherit; }
+    main { padding: 16px 16px 90px; }
+    .header h1 { font-size: 18px; }
+    .grid { grid-template-columns: 1fr; }
+    .bulb-wrap { width: 150px; height: 150px; }
+    .bulb { width: 100px; height: 100px; }
+    .tabs { position: fixed; bottom: 0; left: 0; right: 0; border-radius: 0; margin: 0; padding: 8px; background: var(--panel); border-top: 1px solid var(--line); z-index: 5; }
+    .tab { font-size: 11px; padding: 8px 2px; }
+    .tiles { grid-template-columns: 1fr 1fr; }
+    canvas { width: 220px; height: 220px; }
+  }
+</style>
+</head>
+<body>
+<div class="mobile-top">
+  <span class="brand"><span class="dot"></span></span>
+  <select id="mobileDevice" aria-label="Ampul seç"></select>
+  <button class="icon-btn" onclick="openModal()" title="Ampul ekle">＋</button>
+  <button class="icon-btn" onclick="toggleTheme()" title="Tema">◐</button>
+</div>
+
+<div class="app">
+  <aside>
+    <div class="brand"><span class="dot"></span> Yeelight Kontrol</div>
+    <div class="section-title">Ampuller</div>
+    <div id="deviceList"></div>
+    <button class="ghost-btn" onclick="rescan()">⟳ Ağı tara</button>
+    <button class="ghost-btn" onclick="openModal()">＋ IP ile ekle</button>
+    <div class="aside-foot">
+      <button class="icon-btn" onclick="toggleTheme()">◐ Tema</button>
+      <span class="muted" style="align-self:center">Telefondan: http://192.168.1.9:8000</span>
+    </div>
+  </aside>
+
+  <main>
+    <div class="header">
+      <div>
+        <h1 id="devName">Ofis Ampulü</h1>
+        <div class="meta" id="devMeta">Color Bulb 1S · 192.168.1.50 · bağlı</div>
+      </div>
+      <button class="power" id="power" onclick="togglePower()" title="Aç / kapat">⏻</button>
+    </div>
+
+    <div class="grid">
+      <div class="card preview">
+        <div class="bulb-wrap"><div class="bulb" id="bulb"></div></div>
+        <div class="readout"><b id="readMode">Renk</b><div id="readVal">#FF8A3D</div></div>
+        <div class="slider-row">☀<input type="range" id="bright" min="1" max="100" value="80" aria-label="Parlaklık"><span id="brightVal">80%</span></div>
+      </div>
+
+      <div class="card">
+        <div class="tabs" role="tablist">
+          <button class="tab active" data-pane="color">🎨 Renk</button>
+          <button class="tab" data-pane="white">☀ Beyaz</button>
+          <button class="tab" data-pane="scenes">★ Sahneler</button>
+          <button class="tab" data-pane="flows">〰 Akışlar</button>
+          <button class="tab" data-pane="timer">⏱ Zamanlayıcı</button>
+        </div>
+
+        <section class="pane active" id="pane-color">
+          <div class="wheel-box">
+            <canvas id="wheel" width="240" height="240" aria-label="Renk çarkı"></canvas>
+            <div>
+              <div class="muted" style="margin-bottom:8px">Hızlı renkler</div>
+              <div class="palette" id="palette"></div>
+              <div class="hex">Seçili: <code id="hexOut">#FF8A3D</code></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="pane" id="pane-white">
+          <div class="slider-row" style="margin-top:6px"><span>1700K</span><input type="range" id="ct" min="1700" max="6500" step="100" value="4000" aria-label="Renk sıcaklığı"><span style="width:48px">6500K</span></div>
+          <div class="ct-presets" id="ctPresets"></div>
+          <p class="muted">Sola: sıcak, mum ışığı tonu · Sağa: soğuk, gün ışığı tonu</p>
+        </section>
+
+        <section class="pane" id="pane-scenes">
+          <div class="tiles" id="sceneTiles"></div>
+        </section>
+
+        <section class="pane" id="pane-flows">
+          <div class="tiles" id="flowTiles"></div>
+          <div class="row"><button class="pill" onclick="stopFlow()">■ Akışı durdur</button></div>
+        </section>
+
+        <section class="pane" id="pane-timer">
+          <div class="muted">Ampul seçilen süre sonunda kendiliğinden kapanır. PC kapalı olsa bile çalışır.</div>
+          <div class="ct-presets" id="timerPresets"></div>
+          <div class="row"><input type="number" id="timerCustom" min="1" max="1440" placeholder="dk" style="width:90px"><button class="primary" onclick="setTimer(+document.getElementById('timerCustom').value)">Kur</button></div>
+          <div class="timer-status" id="timerStatus">Aktif zamanlayıcı yok</div>
+        </section>
+      </div>
+    </div>
+
+    <div class="log" id="log"><div class="muted">Mockup komut günlüğü: ampule gidecek komutlar burada görünür</div></div>
+  </main>
+</div>
+
+<div class="modal" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="card">
+    <h3>Ampul ekle</h3>
+    <div class="muted">Otomatik tarama bulamazsa ampulün IP adresini gir. IP'yi modemin arayüzünden veya Yeelight uygulamasındaki cihaz bilgisinden bulabilirsin.</div>
+    <label for="ipIn">IP adresi</label><input type="text" id="ipIn" placeholder="192.168.1.50">
+    <label for="nameIn">İsim (isteğe bağlı)</label><input type="text" id="nameIn" placeholder="Salon">
+    <div class="row" style="justify-content:flex-end"><button class="pill" onclick="closeModal()">Vazgeç</button><button class="primary" onclick="addDevice()">Bağlan</button></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const state = {
+  devices: [
+    { id: 1, name: "Ofis Ampulü", model: "Color Bulb 1S", ip: "192.168.1.50", online: true },
+    { id: 2, name: "Salon", model: "Color Bulb 1S", ip: "192.168.1.51", online: false },
+  ],
+  current: 1, power: true, mode: "rgb", rgb: [255, 138, 61], ct: 4000, bright: 80, flow: null, timer: null,
+};
+const palette = ["#ff3b30","#ff9500","#ffcc00","#34c759","#00c7be","#007aff","#5856d6","#ff2d92"];
+const scenes = [
+  { name: "Çalışma", desc: "4000K · %100", mode: "ct", ct: 4000, bright: 100 },
+  { name: "Okuma", desc: "3500K · %80", mode: "ct", ct: 3500, bright: 80 },
+  { name: "Film", desc: "Koyu mavi · %20", mode: "rgb", rgb: [40, 60, 200], bright: 20 },
+  { name: "Gece", desc: "2700K · %5", mode: "ct", ct: 2700, bright: 5 },
+  { name: "Benim mor", desc: "Kullanıcı · %60", mode: "rgb", rgb: [150, 60, 255], bright: 60, custom: true },
+];
+const flows = [
+  { name: "Disko", desc: "Hızlı renk geçişi", colors: ["#ff0040","#00ff80","#0080ff","#ffee00"], speed: 400 },
+  { name: "Mum ışığı", desc: "Titreyen sıcak ton", colors: ["#ff8a2a","#ff6a10","#ff9a40"], speed: 300 },
+  { name: "Gün doğumu", desc: "15 dk yavaş aydınlanma", colors: ["#3a0a00","#ff5a1f","#ffb35c","#fff2d9"], speed: 1500 },
+  { name: "Okyanus", desc: "Mavi-yeşil dalga", colors: ["#0055ff","#00c2b8","#0a7aff"], speed: 1200 },
+  { name: "Polis", desc: "Kırmızı / mavi", colors: ["#ff0000","#0000ff"], speed: 250 },
+];
+const ctPresets = [[2700,"Sıcak"],[3500,"Doğal sıcak"],[4500,"Nötr"],[6500,"Gün ışığı"]];
+const timerPresets = [15, 30, 60, 120];
+let flowTimer = null, timerTick = null;
+
+const $ = (id) => document.getElementById(id);
+const hex = (c) => "#" + c.map(v => v.toString(16).padStart(2, "0")).join("").toUpperCase();
+function ctToRgb(k) {
+  const t = k / 100; let r, g, b;
+  r = t <= 66 ? 255 : 329.7 * Math.pow(t - 60, -0.1332);
+  g = t <= 66 ? 99.47 * Math.log(t) - 161.12 : 288.12 * Math.pow(t - 60, -0.0755);
+  b = t >= 66 ? 255 : t <= 19 ? 0 : 138.52 * Math.log(t - 10) - 305.04;
+  return [r, g, b].map(v => Math.max(0, Math.min(255, Math.round(v))));
+}
+
+function log(cmd) {
+  const el = $("log"), line = document.createElement("div");
+  line.innerHTML = `<b>→</b> ${cmd}`;
+  el.appendChild(line); el.scrollTop = el.scrollHeight;
+}
+function toast(msg) { const t = $("toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 2000); }
+
+function render() {
+  const d = state.devices.find(x => x.id === state.current);
+  $("devName").textContent = d.name;
+  $("devMeta").textContent = `${d.model} · ${d.ip} · ${d.online ? "bağlı" : "erişilemiyor"}`;
+  const col = state.mode === "ct" ? ctToRgb(state.ct) : state.rgb;
+  const b = $("bulb"), a = 0.25 + state.bright / 133;
+  if (state.power && d.online) {
+    b.style.background = `radial-gradient(circle at 40% 35%, #fff, ${hex(col)} 55%)`;
+    b.style.boxShadow = `0 0 ${30 + state.bright}px ${10 + state.bright / 3}px rgba(${col.join(",")},${a * 0.6})`;
+    b.style.opacity = a;
+  } else {
+    b.style.background = "var(--panel-2)"; b.style.boxShadow = "none"; b.style.opacity = 1;
+  }
+  $("power").classList.toggle("off", !state.power);
+  $("readMode").textContent = !state.power ? "Kapalı" : state.flow ? `Akış: ${state.flow}` : state.mode === "ct" ? "Beyaz" : "Renk";
+  $("readVal").textContent = state.mode === "ct" ? `${state.ct} K` : hex(state.rgb);
+  $("hexOut").textContent = hex(state.rgb);
+  $("bright").value = state.bright; $("brightVal").textContent = state.bright + "%";
+  $("ct").value = state.ct;
+  renderDevices();
+}
+
+function renderDevices() {
+  const list = $("deviceList"); list.innerHTML = "";
+  const sel = $("mobileDevice"); sel.innerHTML = "";
+  state.devices.forEach(d => {
+    const btn = document.createElement("button");
+    btn.className = "device" + (d.id === state.current ? " active" : "") + (d.online ? "" : " offline");
+    const col = d.id === state.current && state.power ? (state.mode === "ct" ? ctToRgb(state.ct) : state.rgb) : [60, 60, 60];
+    btn.innerHTML = `<span class="swatch" style="background:${hex(col)}"></span><span>${d.name}<small>${d.ip}</small></span><span class="status"></span>`;
+    btn.onclick = () => { state.current = d.id; render(); if (!d.online) toast("Bu ampule şu an ulaşılamıyor"); };
+    list.appendChild(btn);
+    const o = new Option(`${d.name} (${d.online ? "bağlı" : "çevrimdışı"})`, d.id, false, d.id === state.current);
+    sel.appendChild(o);
+  });
+  sel.onchange = () => { state.current = +sel.value; render(); };
+}
+
+function togglePower() { state.power = !state.power; log(`set_power ["${state.power ? "on" : "off"}","smooth",300]`); if (!state.power) stopFlow(true); render(); }
+function setRgb(c) { stopFlow(true); state.mode = "rgb"; state.rgb = c; state.power = true; log(`set_rgb [${(c[0] << 16) + (c[1] << 8) + c[2]},"smooth",300]   // ${hex(c)}`); render(); drawWheel(); }
+function setCt(k) { stopFlow(true); state.mode = "ct"; state.ct = k; state.power = true; log(`set_ct_abx [${k},"smooth",300]`); render(); }
+
+/* Renk çarkı */
+const wheel = $("wheel"), ctx = wheel.getContext("2d");
+function drawWheel() {
+  const r = wheel.width / 2, img = ctx.createImageData(wheel.width, wheel.height);
+  for (let y = 0; y < wheel.height; y++) for (let x = 0; x < wheel.width; x++) {
+    const dx = x - r, dy = y - r, dist = Math.hypot(dx, dy), i = (y * wheel.width + x) * 4;
+    if (dist > r) { img.data[i + 3] = 0; continue; }
+    const [R, G, B] = hsvToRgb((Math.atan2(dy, dx) * 180 / Math.PI + 360) % 360, dist / r, 1);
+    img.data[i] = R; img.data[i + 1] = G; img.data[i + 2] = B; img.data[i + 3] = 255;
+  }
+  ctx.putImageData(img, 0, 0);
+}
+function hsvToRgb(h, s, v) {
+  const f = (n) => { const k = (n + h / 60) % 6; return v - v * s * Math.max(0, Math.min(k, 4 - k, 1)); };
+  return [f(5), f(3), f(1)].map(x => Math.round(x * 255));
+}
+let dragging = false, lastSend = 0;
+function pick(e) {
+  const rect = wheel.getBoundingClientRect(), r = rect.width / 2;
+  const dx = e.clientX - rect.left - r, dy = e.clientY - rect.top - r;
+  const s = Math.min(1, Math.hypot(dx, dy) / r), h = (Math.atan2(dy, dx) * 180 / Math.PI + 360) % 360;
+  const c = hsvToRgb(h, s, 1);
+  const now = Date.now();
+  if (now - lastSend > 150 || e.type === "pointerup") { lastSend = now; setRgb(c); }   // kısma: sürüklerken en fazla ~7 komut/sn
+  else { state.rgb = c; state.mode = "rgb"; render(); }
+}
+wheel.addEventListener("pointerdown", e => { dragging = true; wheel.setPointerCapture(e.pointerId); pick(e); });
+wheel.addEventListener("pointermove", e => dragging && pick(e));
+wheel.addEventListener("pointerup", e => { dragging = false; pick(e); });
+
+/* Sürgüler */
+$("bright").addEventListener("input", e => { state.bright = +e.target.value; render(); });
+$("bright").addEventListener("change", e => log(`set_bright [${e.target.value},"smooth",300]`));
+$("ct").addEventListener("input", e => { state.mode = "ct"; state.ct = +e.target.value; render(); });
+$("ct").addEventListener("change", e => setCt(+e.target.value));
+
+/* Sekmeler */
+document.querySelectorAll(".tab").forEach(t => t.onclick = () => {
+  document.querySelectorAll(".tab").forEach(x => x.classList.toggle("active", x === t));
+  document.querySelectorAll(".pane").forEach(p => p.classList.toggle("active", p.id === "pane-" + t.dataset.pane));
+});
+
+/* Palet, sahneler, akışlar, zamanlayıcı */
+palette.forEach(p => {
+  const b = document.createElement("button"); b.style.background = p; b.title = p;
+  b.onclick = () => setRgb([1, 3, 5].map(i => parseInt(p.slice(i, i + 2), 16)));
+  $("palette").appendChild(b);
+});
+ctPresets.forEach(([k, n]) => { const b = document.createElement("button"); b.className = "pill"; b.textContent = `${n} · ${k}K`; b.onclick = () => setCt(k); $("ctPresets").appendChild(b); });
+
+function renderScenes() {
+  const box = $("sceneTiles"); box.innerHTML = "";
+  scenes.forEach((s, i) => {
+    const col = s.mode === "ct" ? ctToRgb(s.ct) : s.rgb;
+    const t = document.createElement("button"); t.className = "tile";
+    t.innerHTML = `<div class="chip" style="background:${hex(col)};opacity:${0.35 + s.bright / 150}"></div>${s.name}<small>${s.desc}</small>` + (s.custom ? `<span class="del" title="Sil">✕</span>` : "");
+    t.onclick = (e) => {
+      if (e.target.classList.contains("del")) { scenes.splice(i, 1); renderScenes(); toast("Sahne silindi"); return; }
+      state.bright = s.bright; s.mode === "ct" ? setCt(s.ct) : setRgb(s.rgb);
+      log(`set_scene ["${s.mode === "ct" ? "ct" : "color"}",${s.mode === "ct" ? s.ct : (s.rgb[0] << 16) + (s.rgb[1] << 8) + s.rgb[2]},${s.bright}]`);
+      toast(`"${s.name}" sahnesi uygulandı`);
+    };
+    box.appendChild(t);
+  });
+  const add = document.createElement("button"); add.className = "tile add"; add.textContent = "＋ Şu anki ayarı kaydet";
+  add.onclick = () => {
+    const name = prompt("Sahne adı:", "Yeni sahne"); if (!name) return;
+    scenes.push({ name, desc: `Kullanıcı · %${state.bright}`, mode: state.mode, rgb: [...state.rgb], ct: state.ct, bright: state.bright, custom: true });
+    renderScenes(); toast("Sahne kaydedildi");
+  };
+  box.appendChild(add);
+}
+
+function renderFlows() {
+  const box = $("flowTiles"); box.innerHTML = "";
+  flows.forEach(f => {
+    const t = document.createElement("button"); t.className = "tile" + (state.flow === f.name ? " running" : "");
+    t.innerHTML = `<div class="chip" style="background:linear-gradient(90deg,${f.colors.join(",")})"></div>${f.name}<small>${f.desc}</small>`;
+    t.onclick = () => startFlow(f);
+    box.appendChild(t);
+  });
+}
+function startFlow(f) {
+  stopFlow(true); state.flow = f.name; state.power = true; state.mode = "rgb";
+  let i = 0; flowTimer = setInterval(() => { state.rgb = f.colors[i++ % f.colors.length].match(/\w\w/g).map(x => parseInt(x, 16)); render(); }, f.speed);
+  log(`start_cf [0,1,"${f.colors.map(c => `${f.speed},1,${parseInt(c.slice(1), 16)},${state.bright}`).join(",")}"]`);
+  renderFlows(); render();
+}
+function stopFlow(silent) {
+  if (!state.flow) return;
+  clearInterval(flowTimer); state.flow = null;
+  if (!silent) log("stop_cf []");
+  renderFlows(); render();
+}
+
+timerPresets.forEach(m => { const b = document.createElement("button"); b.className = "pill"; b.textContent = m < 60 ? `${m} dk` : `${m / 60} saat`; b.onclick = () => setTimer(m); $("timerPresets").appendChild(b); });
+function setTimer(m) {
+  if (!m || m < 1) return;
+  state.timer = Date.now() + m * 60000; log(`cron_add [0,${m}]`);
+  clearInterval(timerTick); timerTick = setInterval(updTimer, 1000); updTimer(); toast(`${m} dk sonra kapanacak`);
+}
+function updTimer() {
+  const el = $("timerStatus");
+  if (!state.timer) { el.textContent = "Aktif zamanlayıcı yok"; return; }
+  const left = Math.max(0, state.timer - Date.now()), mm = Math.floor(left / 60000), ss = Math.floor(left / 1000) % 60;
+  el.innerHTML = `Kapanmaya kalan: <b>${mm}:${String(ss).padStart(2, "0")}</b> &nbsp; <button class="pill" onclick="cancelTimer()">İptal</button>`;
+}
+function cancelTimer() { state.timer = null; clearInterval(timerTick); log("cron_del [0]"); updTimer(); }
+
+/* Cihaz ekleme, tarama, tema */
+function openModal() { $("modal").classList.add("open"); $("ipIn").focus(); }
+function closeModal() { $("modal").classList.remove("open"); }
+function addDevice() {
+  const ip = $("ipIn").value.trim();
+  if (!/^\d{1,3}(\.\d{1,3}){3}$/.test(ip)) { toast("Geçerli bir IP gir"); return; }
+  const id = Date.now();
+  state.devices.push({ id, name: $("nameIn").value.trim() || "Yeni ampul", model: "Color Bulb 1S", ip, online: true });
+  state.current = id; closeModal(); render(); toast("Ampul eklendi");
+}
+function rescan() { toast("Ağ taranıyor…"); log("M-SEARCH wifi_bulb → 239.255.255.250:1982"); setTimeout(() => toast("2 ampul bulundu"), 1200); }
+function toggleTheme() { const r = document.documentElement; r.dataset.theme = r.dataset.theme === "light" ? "dark" : "light"; }
+
+drawWheel(); renderScenes(); renderFlows(); render();
+</script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+.pytest_cache/
+
+# Yerel veri: ampul token'ı, ev ağı adı, ağ kayıtları — asla paylaşılmaz
+data/
+
+# graphify çıktısı: bu bilgisayarın yollarını içerir, her makinede `/graphify .` ile yeniden üretilir
+graphify-out/
